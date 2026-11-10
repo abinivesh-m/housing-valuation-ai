@@ -6,7 +6,13 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb",
-        "includeFiles": ["app.py", "static/**", "models/**", "requirements.txt"]
+        "includeFiles": [
+          "app.py",
+          "engine/**",
+          "artifacts/**",
+          "static/**",
+          "requirements.txt"
+        ]
       }
     }
   ],

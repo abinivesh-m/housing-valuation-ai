@@ -1,445 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HousingValuation AI — Property Valuation Engine</title>
-  <meta name="description" content="AI-powered property valuation engine for Indian real estate." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #f8f9fc;
-      --panel: #ffffff;
-      --line: rgba(0,0,0,0.06);
-      --line-strong: rgba(0,0,0,0.12);
-      --text: #1a1a2e;
-      --muted: #5a5a72;
-      --faint: #9090a8;
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --primary-soft: rgba(37,99,235,0.08);
-      --green: #16a34a;
-      --green-soft: rgba(22,163,74,0.08);
-      --orange: #ea580c;
-      --yellow: #ca8a04;
-      --font: 'Inter', -apple-system, system-ui, sans-serif;
-      --mono: 'JetBrains Mono', monospace;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-      --radius: 12px;
-      --radius-sm: 8px;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-
-    .topbar {
-      background: rgba(255,255,255,0.9); backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--line); padding: 14px 32px;
-      display: flex; align-items: center; justify-content: space-between;
-      box-shadow: 0 1px 8px rgba(0,0,0,0.04);
-    }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 12px rgba(37,99,235,0.25);
-    }
-    .brand-icon svg { width: 20px; height: 20px; color: #fff; }
-    .brand-name { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
-    .brand-sub { font-size: 10px; color: var(--faint); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 1px; }
-    .topbar-right { display: flex; align-items: center; gap: 16px; }
-    .status-pill {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--green-soft); border: 1px solid rgba(22,163,74,0.2);
-      padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 500; color: var(--green);
-    }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
-
-    .hero {
-      text-align: center; margin-bottom: 32px;
-    }
-    .hero h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
-    .hero h1 span { color: var(--primary); }
-    .hero p { color: var(--muted); font-size: 15px; max-width: 600px; margin: 0 auto; }
-
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-
-    .card {
-      background: var(--panel); border: 1px solid var(--line);
-      border-radius: var(--radius); padding: 24px;
-      box-shadow: var(--shadow-md);
-    }
-    .card-title {
-      font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px;
-      color: var(--muted); margin-bottom: 16px; font-weight: 600;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .card-title::before { content: ''; width: 3px; height: 14px; background: var(--primary); border-radius: 2px; }
-
-    .form-row { margin-bottom: 14px; }
-    .form-row label { display: block; font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; margin-bottom: 6px; font-weight: 600; }
-    .form-row select, .form-row input {
-      width: 100%; background: #fff; border: 1px solid var(--line-strong);
-      color: var(--text); padding: 10px 12px; border-radius: var(--radius-sm);
-      font-family: var(--font); font-size: 13px; transition: all 0.2s;
-      box-shadow: var(--shadow-sm);
-    }
-    .form-row select:focus, .form-row input:focus {
-      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft);
-    }
-    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-
-    .btn-valuate {
-      width: 100%; padding: 14px 24px;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: #fff; border: none; border-radius: var(--radius-sm);
-      font-family: var(--font); font-size: 14px; font-weight: 600;
-      letter-spacing: 0.5px; cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 12px rgba(37,99,235,0.25);
-      margin-top: 8px;
-    }
-    .btn-valuate:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.35); }
-    .btn-valuate:active { transform: translateY(0); }
-    .btn-valuate:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-    /* Result */
-    .result-hero {
-      text-align: center; padding: 24px 0;
-      border-bottom: 1px solid var(--line); margin-bottom: 20px;
-    }
-    .result-price { font-size: 42px; font-weight: 800; color: var(--primary); font-family: var(--mono); letter-spacing: -1px; }
-    .result-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1.5px; margin-bottom: 4px; }
-    .result-range { font-size: 13px; color: var(--muted); margin-top: 4px; }
-    .result-per-sqft { font-size: 12px; color: var(--faint); margin-top: 2px; }
-
-    .result-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .result-metric {
-      background: var(--bg); border: 1px solid var(--line);
-      border-radius: var(--radius-sm); padding: 12px; text-align: center;
-    }
-    .result-metric .rm-label { font-size: 9px; text-transform: uppercase; color: var(--faint); letter-spacing: 1px; margin-bottom: 4px; }
-    .result-metric .rm-value { font-size: 18px; font-weight: 700; font-family: var(--mono); }
-    .result-metric .rm-value.green { color: var(--green); }
-    .result-metric .rm-value.blue { color: var(--primary); }
-
-    .factors { display: flex; flex-direction: column; gap: 8px; }
-    .factor {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 12px; background: var(--bg);
-      border-radius: var(--radius-sm); border: 1px solid var(--line);
-    }
-    .factor-name { font-size: 12px; color: var(--text); flex: 1; }
-    .factor-value { font-size: 11px; color: var(--muted); font-family: var(--mono); }
-    .factor-bar { width: 80px; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
-    .factor-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #60a5fa); border-radius: 2px; }
-    .factor-impact { font-size: 10px; color: var(--primary); font-weight: 600; font-family: var(--mono); min-width: 40px; text-align: right; }
-
-    .metrics-row {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
-      margin-top: 24px;
-    }
-    .metric-box {
-      background: var(--panel); border: 1px solid var(--line);
-      border-radius: var(--radius); padding: 16px; text-align: center;
-      box-shadow: var(--shadow-sm);
-    }
-    .metric-box .mb-label { font-size: 9px; text-transform: uppercase; color: var(--faint); letter-spacing: 1.5px; margin-bottom: 6px; }
-    .metric-box .mb-value { font-size: 24px; font-weight: 700; font-family: var(--mono); color: var(--primary); }
-    .metric-box .mb-sub { font-size: 9px; color: var(--muted); margin-top: 4px; }
-
-    .empty-state { color: var(--faint); font-size: 13px; text-align: center; padding: 40px 20px; }
-
-    .loading { display: none; text-align: center; padding: 20px; }
-    .loading.show { display: block; }
-    .spinner { width: 32px; height: 32px; border: 3px solid var(--line); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 8px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .metrics-row { grid-template-columns: repeat(2, 1fr); } }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HousingValuation AI — Automated Valuation Engine</title>
+<meta name="description" content="Explainable automated property valuation engine for Indian residential and commercial real estate, with a risk-based lending layer and a tamper-evident audit trail." />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <div class="topbar">
+<div class="app">
+
+  <aside class="rail">
     <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-      </div>
+      <div class="brand-mark">HV</div>
       <div>
         <div class="brand-name">HousingValuation AI</div>
-        <div class="brand-sub">Property Valuation Engine — India</div>
+        <div class="brand-sub">Valuation Engine</div>
       </div>
     </div>
-    <div class="topbar-right">
-      <div class="status-pill">
-        <span class="status-dot"></span>
-        <span>Model Online</span>
-      </div>
+    <nav class="nav">
+      <div class="nav-label">Workspace</div>
+      <button class="nav-item is-active" data-view="valuation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+        <span>Valuation</span>
+      </button>
+      <button class="nav-item" data-view="portfolio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        <span>Portfolio</span>
+      </button>
+      <button class="nav-item" data-view="model">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6 20V9"/><path d="M11 20V4"/><path d="M16 20v-7"/><path d="M21 20v-4"/></svg>
+        <span>Model &amp; data</span>
+      </button>
+      <button class="nav-item" data-view="governance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span>Governance</span>
+      </button>
+      <div class="nav-label" style="margin-top:14px">Reference</div>
+      <button class="nav-item" id="nav-api">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/></svg>
+        <span>API docs</span>
+      </button>
+    </nav>
+    <div class="rail-foot">
+      <div><strong>Model v2.0</strong> · schema 2</div>
+      <div id="rail-trained">loading artifact…</div>
     </div>
-  </div>
+  </aside>
 
-  <div class="container">
-    <div class="hero">
-      <h1>AI-Powered <span>Property Valuation</span></h1>
-      <p>Estimate the fair market value of residential and commercial properties across India. Powered by machine learning on 5,000+ property records.</p>
-    </div>
-
-    <div class="grid">
-      <!-- Input Form -->
-      <div class="card">
-        <div class="card-title">Property Details</div>
-        <form id="val-form">
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>City</label>
-              <select id="city" onchange="updateLocalities()"></select>
-            </div>
-            <div class="form-group">
-              <label>Locality</label>
-              <select id="locality"></select>
-            </div>
-          </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label>Property Type</label>
-              <select id="property_type">
-                <option>Apartment</option>
-                <option>Villa</option>
-                <option>Independent House</option>
-                <option>Studio</option>
-                <option>Penthouse</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Furnishing</label>
-              <select id="furnishing">
-                <option>Unfurnished</option>
-                <option>Semi-Furnished</option>
-                <option>Fully Furnished</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row-3">
-            <div class="form-group">
-              <label>Area (sqft)</label>
-              <input type="number" id="area_sqft" value="1200" min="200" max="10000" />
-            </div>
-            <div class="form-group">
-              <label>Bedrooms</label>
-              <input type="number" id="bedrooms" value="2" min="1" max="6" />
-            </div>
-            <div class="form-group">
-              <label>Bathrooms</label>
-              <input type="number" id="bathrooms" value="2" min="1" max="6" />
-            </div>
-          </div>
-          <div class="form-row-3">
-            <div class="form-group">
-              <label>Floor</label>
-              <input type="number" id="floor" value="5" min="0" max="50" />
-            </div>
-            <div class="form-group">
-              <label>Total Floors</label>
-              <input type="number" id="total_floors" value="15" min="1" max="50" />
-            </div>
-            <div class="form-group">
-              <label>Age (years)</label>
-              <input type="number" id="age_years" value="5" min="0" max="50" />
-            </div>
-          </div>
-          <div class="form-row-3">
-            <div class="form-group">
-              <label>Parking</label>
-              <input type="number" id="parking" value="1" min="0" max="5" />
-            </div>
-            <div class="form-group">
-              <label>Lift (0/1)</label>
-              <input type="number" id="lift" value="1" min="0" max="1" />
-            </div>
-            <div class="form-group">
-              <label>Balcony</label>
-              <input type="number" id="balcony" value="1" min="0" max="4" />
-            </div>
-          </div>
-          <div class="form-row-3">
-            <div class="form-group">
-              <label>Metro Dist (km)</label>
-              <input type="number" id="metro_distance_km" value="2.0" min="0" max="20" step="0.1" />
-            </div>
-            <div class="form-group">
-              <label>School Dist (km)</label>
-              <input type="number" id="school_distance_km" value="1.5" min="0" max="10" step="0.1" />
-            </div>
-            <div class="form-group">
-              <label>Hospital Dist (km)</label>
-              <input type="number" id="hospital_distance_km" value="2.0" min="0" max="10" step="0.1" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Crime Index (1-10)</label>
-            <input type="number" id="crime_index" value="5.0" min="1" max="10" step="0.1" />
-          </div>
-          <button type="submit" class="btn-valuate" id="btn-valuate">🔍 VALUATE PROPERTY</button>
-        </form>
+  <div class="shell">
+    <header class="topbar">
+      <div>
+        <h1 id="page-title">Property valuation</h1>
+        <div class="sub" id="page-sub">Single-property AVM with conformal confidence and a policy-evaluated lending position</div>
       </div>
+      <div class="topbar-right">
+        <div class="chip wide" id="chip-coverage"><span class="dot"></span><span>8 cities · 64 micro-markets</span></div>
+        <div class="chip" id="chip-engine"><span class="dot"></span><span>Engine ready</span></div>
+      </div>
+    </header>
 
-      <!-- Result -->
-      <div class="card">
-        <div class="card-title">Valuation Result</div>
-        <div id="result-area">
-          <div class="empty-state">
-            <p>Fill in property details and click "Valuate" to get an AI-powered estimate.</p>
+    <main>
+
+      <!-- ================= VALUATION ================= -->
+      <section class="view is-active" id="view-valuation">
+        <div class="grid val-layout">
+
+          <div class="card" style="position:sticky;top:86px">
+            <div class="card-hd">
+              <h2>Property record</h2>
+              <span class="hint" id="form-hint">8 cities</span>
+            </div>
+            <div class="card-bd">
+              <div class="samples" id="samples"></div>
+
+              <form id="val-form" style="margin-top:15px">
+                <div class="fieldset">
+                  <div class="fieldset-title">Location</div>
+                  <div class="row c2">
+                    <div class="field"><label for="city">City</label><select id="city"></select></div>
+                    <div class="field"><label for="locality">Locality</label><select id="locality"></select></div>
+                  </div>
+                </div>
+
+                <div class="fieldset">
+                  <div class="fieldset-title">Property</div>
+                  <div class="row c2">
+                    <div class="field"><label for="property_type">Type</label><select id="property_type"></select></div>
+                    <div class="field"><label for="furnishing">Furnishing</label><select id="furnishing"></select></div>
+                  </div>
+                  <div class="row c3">
+                    <div class="field"><label for="area_sqft">Area (sqft)</label><input type="number" id="area_sqft" value="1250" min="150" max="40000" step="10" /></div>
+                    <div class="field"><label for="bedrooms">Bedrooms</label><input type="number" id="bedrooms" value="3" min="0" max="10" /></div>
+                    <div class="field"><label for="bathrooms">Bathrooms</label><input type="number" id="bathrooms" value="2" min="0" max="10" /></div>
+                  </div>
+                  <div class="row c3">
+                    <div class="field"><label for="floor">Floor</label><input type="number" id="floor" value="7" min="0" max="80" /></div>
+                    <div class="field"><label for="total_floors">Total floors</label><input type="number" id="total_floors" value="14" min="1" max="80" /></div>
+                    <div class="field"><label for="age_years">Age (yrs)</label><input type="number" id="age_years" value="5" min="0" max="60" /></div>
+                  </div>
+                  <div class="row c3">
+                    <div class="field"><label for="parking">Parking</label><input type="number" id="parking" value="1" min="0" max="10" /></div>
+                    <div class="field"><label for="lift">Lift (0/1)</label><input type="number" id="lift" value="1" min="0" max="1" /></div>
+                    <div class="field"><label for="balcony">Balconies</label><input type="number" id="balcony" value="1" min="0" max="5" /></div>
+                  </div>
+                  <div class="row c2">
+                    <div class="field"><label for="occupancy">Occupancy</label><select id="occupancy"></select></div>
+                    <div class="field"><label for="tenure">Tenure</label><select id="tenure"></select></div>
+                  </div>
+                </div>
+
+                <div class="fieldset">
+                  <div class="fieldset-title">Micro-market access</div>
+                  <div class="row c2">
+                    <div class="field"><label for="metro_distance_km">Metro (km)</label><input type="number" id="metro_distance_km" value="1.2" min="0" max="25" step="0.1" /></div>
+                    <div class="field"><label for="highway_distance_km">Highway (km)</label><input type="number" id="highway_distance_km" value="2.4" min="0" max="30" step="0.1" /></div>
+                  </div>
+                  <div class="row c2">
+                    <div class="field"><label for="school_distance_km">School (km)</label><input type="number" id="school_distance_km" value="0.6" min="0" max="15" step="0.1" /></div>
+                    <div class="field"><label for="hospital_distance_km">Hospital (km)</label><input type="number" id="hospital_distance_km" value="1.1" min="0" max="15" step="0.1" /></div>
+                  </div>
+                  <div class="row c2">
+                    <div class="field"><label for="crime_index">Crime index (1–10)</label><input type="number" id="crime_index" value="4.2" min="1" max="10" step="0.1" /></div>
+                    <div class="field"><label for="requested_loan_inr">Loan sought (₹)</label><input type="number" id="requested_loan_inr" value="0" min="0" step="50000" placeholder="0 = 60% reference LTV" /></div>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submit-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                  Run valuation
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="val-right">
+            <div class="card" id="result-card">
+              <div id="result-body">
+                <div class="empty">
+                  <div class="big">No valuation yet</div>
+                  Select a property and run the engine.<br />
+                  Output: point value, p10–p90 band, driver attribution, comparable sales, lending position.
+                </div>
+              </div>
+            </div>
+
+            <div class="duo">
+              <div class="card">
+                <div class="card-hd">
+                  <h2>Price drivers</h2>
+                  <span class="hint">vs. typical property in the micro-market</span>
+                </div>
+                <div class="card-bd" id="drivers-body">
+                  <div class="empty">Attribution appears after a valuation.</div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-hd">
+                  <h2>Lending position</h2>
+                  <span class="hint">policy-evaluated</span>
+                </div>
+                <div class="card-bd" id="lending-body">
+                  <div class="empty">Decision appears after a valuation.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-hd">
+                <h2>Comparable sales</h2>
+                <span class="hint" id="comps-hint">adjustment grid applied</span>
+              </div>
+              <div class="card-bd tight" id="comps-body">
+                <div class="empty">Comparables appear after a valuation.</div>
+              </div>
+            </div>
+
+            <div class="duo">
+              <div class="card">
+                <div class="card-hd">
+                  <h2>Geo context</h2>
+                  <span class="hint" id="geo-source">OpenStreetMap · 1.5 km radius</span>
+                </div>
+                <div class="card-bd" id="geo-body">
+                  <div class="empty">Live POI density appears after a valuation.</div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-hd">
+                  <h2>Audit reference</h2>
+                  <span class="hint">hash-chained</span>
+                </div>
+                <div class="card-bd" id="audit-mini">
+                  <div class="empty">Each valuation appends an immutable ledger entry.</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="loading" id="loading">
-          <div class="spinner"></div>
-          <p style="color:var(--muted);font-size:12px;">Analyzing property...</p>
+      </section>
+
+      <!-- ================= PORTFOLIO ================= -->
+      <section class="view" id="view-portfolio">
+        <div class="spread" style="margin-bottom:14px">
+          <div>
+            <div class="section-title">Book-level scoring</div>
+            <div class="section-sub">Score a 24-property book in one pass. Same model, same policy, batched — this is the automation path, not a manual workflow.</div>
+          </div>
+          <button class="btn btn-primary" id="run-book" style="width:auto">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 3l14 9-14 9z"/></svg>
+            Score the book
+          </button>
         </div>
-      </div>
-    </div>
 
-    <!-- Model Metrics -->
-    <div class="metrics-row" id="metrics-row">
-      <div class="metric-box">
-        <div class="mb-label">Model Accuracy (R²)</div>
-        <div class="mb-value" id="m-r2">—</div>
-        <div class="mb-sub">Gradient Boosting</div>
-      </div>
-      <div class="metric-box">
-        <div class="mb-label">Mean Abs Error</div>
-        <div class="mb-value" id="m-mae">—</div>
-        <div class="mb-sub">INR</div>
-      </div>
-      <div class="metric-box">
-        <div class="mb-label">MAPE</div>
-        <div class="mb-value" id="m-mape">—</div>
-        <div class="mb-sub">Mean Abs % Error</div>
-      </div>
-      <div class="metric-box">
-        <div class="mb-label">Training Samples</div>
-        <div class="mb-value" id="m-samples">—</div>
-        <div class="mb-sub">Properties</div>
-      </div>
-    </div>
+        <div class="kpi-grid" id="book-kpis">
+          <div class="kpi"><div class="k">Properties scored</div><div class="v" id="bk-count">—</div><div class="d">single request, no manual step</div></div>
+          <div class="kpi"><div class="k">Straight-through rate</div><div class="v" id="bk-straight">—</div><div class="d">approve without physical inspection</div></div>
+          <div class="kpi"><div class="k">Median confidence</div><div class="v" id="bk-conf">—</div><div class="d">conformal interval + comps agreement</div></div>
+          <div class="kpi"><div class="k">Book value</div><div class="v" id="bk-value">—</div><div class="d">sum of point estimates</div></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-hd"><h2>Decision mix</h2><span class="hint">output of the policy engine</span></div>
+          <div class="card-bd" id="book-mix">
+            <div class="empty">Run the book to populate the decision mix.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><h2>Scored book</h2><span class="hint" id="book-hint">24 properties</span></div>
+          <div class="card-bd tight" id="book-table">
+            <div class="empty">No batch has been run.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= MODEL & DATA ================= -->
+      <section class="view" id="view-model">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="k">Holdout MAPE</div><div class="v" id="k-mape">—</div><div class="d">20% holdout, log-space Huber GBM</div></div>
+          <div class="kpi"><div class="k">Holdout R²</div><div class="v" id="k-r2">—</div><div class="d">price level, not log</div></div>
+          <div class="kpi"><div class="k">Within ±10%</div><div class="v" id="k-w10">—</div><div class="d">share of holdout predictions</div></div>
+          <div class="kpi"><div class="k">Interval coverage</div><div class="v" id="k-cov">—</div><div class="d">measured p10–p90 coverage, nominal 80%</div></div>
+        </div>
+
+        <div class="duo" style="margin-bottom:16px">
+          <div class="card">
+            <div class="card-hd"><h2>Benchmark comparison</h2><span class="hint">identical test rows</span></div>
+            <div class="card-bd" id="bench-body"><div class="empty">Loading…</div></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><h2>Feature importance</h2><span class="hint">split gain, median model</span></div>
+            <div class="card-bd" id="importance-body"><div class="empty">Loading…</div></div>
+          </div>
+        </div>
+
+        <div class="duo" style="margin-bottom:16px">
+          <div class="card">
+            <div class="card-hd"><h2>Error by price band</h2><span class="hint">holdout</span></div>
+            <div class="card-bd tight" id="bands-body"><div class="empty">Loading…</div></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><h2>Generalisation check</h2><span class="hint">unseen micro-markets</span></div>
+            <div class="card-bd" id="cv-body"><div class="empty">Loading…</div></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-hd"><h2>Data pipeline</h2><span class="hint">what is live in this build vs. what the production plan adds</span></div>
+          <div class="card-bd">
+            <div class="steps" id="pipeline"></div>
+            <div class="note warn" style="margin-top:14px">
+              <b>Data provenance is stated up front.</b> This prototype is trained on a documented
+              parametric corpus, not on licensed transaction data. Every accuracy figure on this page is
+              measured on that corpus. It proves the pipeline, the calibration and the governance — it is
+              not a claim of real-world AVM accuracy.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><h2>Coverage</h2><span class="hint">8 cities · locality-level medians from the corpus</span></div>
+          <div class="card-bd tight" id="coverage-body"><div class="empty">Loading…</div></div>
+        </div>
+      </section>
+
+      <!-- ================= GOVERNANCE ================= -->
+      <section class="view" id="view-governance">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-hd">
+            <h2>Audit ledger</h2>
+            <div class="inline">
+              <span class="hint" id="ledger-stats">—</span>
+              <button class="btn btn-sm" id="verify-chain">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+                Verify chain
+              </button>
+            </div>
+          </div>
+          <div class="card-bd">
+            <div id="verify-result"></div>
+            <div class="tbl-wrap" id="ledger-body"><div class="empty">Loading ledger…</div></div>
+          </div>
+        </div>
+
+        <div class="duo" style="margin-bottom:16px">
+          <div class="card">
+            <div class="card-hd"><h2>LTV policy</h2><span class="hint">RBI / NHB ceiling, only ever tightened</span></div>
+            <div class="card-bd tight" id="policy-body"><div class="empty">Loading…</div></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><h2>Decision matrix</h2><span class="hint">how a valuation becomes an action</span></div>
+            <div class="card-bd" id="matrix-body"><div class="empty">Loading…</div></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-hd"><h2>Model risk controls</h2><span class="hint">what a validator would ask for</span></div>
+          <div class="card-bd" id="controls-body"><div class="empty">Loading…</div></div>
+        </div>
+
+        <div class="note">
+          <b>Disclaimer.</b> This is a hackathon prototype. Valuations are produced by a model trained on a
+          parametric synthetic corpus and are not certified valuations. The lending layer evaluates a
+          property-risk policy; it does not make a credit decision and is not a substitute for a lender's
+          credit policy, a registered valuer's report, or regulatory approval.
+        </div>
+      </section>
+
+    </main>
   </div>
+</div>
 
-  <script>
-    let localities = {};
-    let options = {};
-
-    async function loadOptions() {
-      const res = await fetch("/api/options");
-      options = await res.json();
-      const citySel = document.getElementById("city");
-      citySel.innerHTML = options.cities.map(c => `<option>${c}</option>`).join("");
-      updateLocalities();
-    }
-
-    function updateLocalities() {
-      const city = document.getElementById("city").value;
-      const locSel = document.getElementById("locality");
-      const locs = options.localities[city] || [];
-      locSel.innerHTML = locs.map(l => `<option>${l}</option>`).join("");
-    }
-
-    async function loadMetrics() {
-      const res = await fetch("/api/metrics");
-      const m = await res.json();
-      document.getElementById("m-r2").textContent = (m.test_r2 * 100).toFixed(1) + "%";
-      document.getElementById("m-mae").textContent = "₹" + (m.test_mae / 100000).toFixed(1) + "L";
-      document.getElementById("m-mape").textContent = (m.test_mape * 100).toFixed(1) + "%";
-      document.getElementById("m-samples").textContent = m.n_samples.toLocaleString();
-    }
-
-    document.getElementById("val-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById("btn-valuate");
-      btn.disabled = true;
-      btn.textContent = "ANALYZING...";
-      document.getElementById("loading").classList.add("show");
-      document.getElementById("result-area").innerHTML = "";
-
-      const payload = {
-        city: document.getElementById("city").value,
-        locality: document.getElementById("locality").value,
-        property_type: document.getElementById("property_type").value,
-        furnishing: document.getElementById("furnishing").value,
-        area_sqft: parseInt(document.getElementById("area_sqft").value),
-        bedrooms: parseInt(document.getElementById("bedrooms").value),
-        bathrooms: parseInt(document.getElementById("bathrooms").value),
-        floor: parseInt(document.getElementById("floor").value),
-        total_floors: parseInt(document.getElementById("total_floors").value),
-        age_years: parseInt(document.getElementById("age_years").value),
-        parking: parseInt(document.getElementById("parking").value),
-        lift: parseInt(document.getElementById("lift").value),
-        balcony: parseInt(document.getElementById("balcony").value),
-        metro_distance_km: parseFloat(document.getElementById("metro_distance_km").value),
-        school_distance_km: parseFloat(document.getElementById("school_distance_km").value),
-        hospital_distance_km: parseFloat(document.getElementById("hospital_distance_km").value),
-        crime_index: parseFloat(document.getElementById("crime_index").value),
-      };
-
-      try {
-        const res = await fetch("/api/valuate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        document.getElementById("loading").classList.remove("show");
-
-        const fmt = (n) => "₹" + n.toLocaleString("en-IN");
-
-        let factorsHtml = data.factors.map(f => `
-          <div class="factor">
-            <div class="factor-name">${f.factor}</div>
-            <div class="factor-value">${f.value}</div>
-            <div class="factor-bar"><div class="factor-bar-fill" style="width:${f.impact}%"></div></div>
-            <div class="factor-impact">${f.impact}%</div>
-          </div>
-        `).join("");
-
-        document.getElementById("result-area").innerHTML = `
-          <div class="result-hero">
-            <div class="result-label">Estimated Market Value</div>
-            <div class="result-price">${fmt(data.estimated_price)}</div>
-            <div class="result-range">${fmt(data.price_range_low)} — ${fmt(data.price_range_high)}</div>
-            <div class="result-per-sqft">₹${data.price_per_sqft.toLocaleString("en-IN")}/sqft · Confidence: ${(data.confidence * 100).toFixed(0)}%</div>
-          </div>
-          <div class="result-metrics">
-            <div class="result-metric">
-              <div class="rm-label">City Average</div>
-              <div class="rm-value blue">${fmt(data.city_avg)}</div>
-            </div>
-            <div class="result-metric">
-              <div class="rm-label">Locality Tier</div>
-              <div class="rm-value ${data.locality_premium === 'Premium' ? 'green' : ''}">${data.locality_premium}</div>
-            </div>
-          </div>
-          <div class="card-title" style="margin-top:8px;">Price Drivers</div>
-          <div class="factors">${factorsHtml}</div>
-        `;
-      } catch (err) {
-        document.getElementById("loading").classList.remove("show");
-        document.getElementById("result-area").innerHTML = `<div class="empty-state">Error: ${err.message}</div>`;
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "🔍 VALUATE PROPERTY";
-      }
-    });
-
-    loadOptions();
-    loadMetrics();
-  </script>
+<script src="/static/app.js"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
+# Runtime dependencies only — the serving path never imports scikit-learn.
+# Training and tests live in requirements-dev.txt.
 fastapi>=0.115,<1.0
-uvicorn[standard]>=0.30
-scikit-learn>=1.5
+uvicorn>=0.30
 numpy>=1.26
-joblib>=1.4
 pydantic>=2.0
