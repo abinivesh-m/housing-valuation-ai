@@ -155,7 +155,7 @@ Retrain the model (needs the dev dependencies):
 pip install -r requirements-dev.txt
 python data_gen.py        # regenerate the parametric corpus -> data/properties.csv
 python train.py           # fit, calibrate, export artifacts/*.json, print all metrics
-python -m pytest -q       # 25 tests
+python -m pytest -q       # 29 tests
 ```
 
 `train.py` refuses to write artifacts if the exported trees do not reproduce scikit-learn exactly.
@@ -230,7 +230,7 @@ artifacts/
   coverage.json            cities, localities, coordinates, sample records
 static/                    console UI (vanilla JS, no build step)
 tests/                     25 API + engine regression tests
-docs/                      model card, data strategy, lending policy, architecture
+docs/                      model card, data strategy, lending policy, architecture, submission note, screenshots
 ```
 
 ---
