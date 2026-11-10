@@ -1,0 +1,111 @@
+{
+  "model": "GradientBoostingRegressor",
+  "n_samples": 5000,
+  "n_features": 18,
+  "feature_names": [
+    "city_enc",
+    "locality_enc",
+    "property_type_enc",
+    "furnishing_enc",
+    "area_sqft",
+    "bedrooms",
+    "bathrooms",
+    "floor",
+    "total_floors",
+    "age_years",
+    "parking",
+    "lift",
+    "balcony",
+    "metro_distance_km",
+    "school_distance_km",
+    "hospital_distance_km",
+    "crime_index",
+    "is_premium_locality"
+  ],
+  "test_mae": 1870320.0,
+  "test_r2": 0.9781,
+  "test_mape": 0.0719,
+  "cv_r2_mean": 0.9781,
+  "cv_r2_std": 0.0017,
+  "feature_importance": [
+    {
+      "feature": "area_sqft",
+      "importance": 0.615
+    },
+    {
+      "feature": "city_enc",
+      "importance": 0.1389
+    },
+    {
+      "feature": "property_type_enc",
+      "importance": 0.1008
+    },
+    {
+      "feature": "is_premium_locality",
+      "importance": 0.0805
+    },
+    {
+      "feature": "locality_enc",
+      "importance": 0.0165
+    },
+    {
+      "feature": "furnishing_enc",
+      "importance": 0.0092
+    },
+    {
+      "feature": "metro_distance_km",
+      "importance": 0.0085
+    },
+    {
+      "feature": "total_floors",
+      "importance": 0.0066
+    },
+    {
+      "feature": "age_years",
+      "importance": 0.0059
+    },
+    {
+      "feature": "bedrooms",
+      "importance": 0.0044
+    },
+    {
+      "feature": "floor",
+      "importance": 0.0035
+    },
+    {
+      "feature": "crime_index",
+      "importance": 0.0031
+    },
+    {
+      "feature": "hospital_distance_km",
+      "importance": 0.0025
+    },
+    {
+      "feature": "school_distance_km",
+      "importance": 0.0019
+    },
+    {
+      "feature": "bathrooms",
+      "importance": 0.0009
+    },
+    {
+      "feature": "lift",
+      "importance": 0.0007
+    },
+    {
+      "feature": "parking",
+      "importance": 0.0007
+    },
+    {
+      "feature": "balcony",
+      "importance": 0.0003
+    }
+  ],
+  "price_range": {
+    "min": 1672000,
+    "max": 165571000,
+    "mean": 28147221
+  },
+  "cities": 8,
+  "property_types": 5
+}
