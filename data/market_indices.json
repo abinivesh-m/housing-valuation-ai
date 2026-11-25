@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "source": "fill from RBI HPI / NHB Residex publications",
+  "captured_at": null,
+  "notes": "City-level published indices. Populate with scripts/fetch_market_indices.py or by hand from the RBI data portal (https://data.rbi.org.in) and NHB Residex releases. Values below are intentionally null: do not fabricate index levels. Once populated, data_gen.py and the validation harness can anchor to them.",
+  "indices": {
+    "rbi_hpi": {
+      "base": "2010-11 = 100",
+      "frequency": "quarterly",
+      "cities": {}
+    },
+    "nhb_residex": {
+      "base": "2012-13 = 100",
+      "frequency": "quarterly",
+      "cities": {}
+    }
+  }
+}
