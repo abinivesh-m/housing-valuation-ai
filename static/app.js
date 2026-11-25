@@ -787,7 +787,7 @@ function renderGovernance(meta) {
     ["Human in the loop", "Physical inspection is mandatory wherever a hard policy check fails. The engine routes; a human decides."],
     ["Explainability", "Per-valuation driver attribution plus comparable-sales cross-check, both returned with the number and archived with it."],
     ["Auditability", "Every valuation and decision is appended to a hash-chained ledger with the input digest, so a post-hoc edit is detectable."],
-    ["Data provenance", "The prototype states its corpus is synthetic. A production deployment must record dataset lineage and licensing per feature."],
+    ["Data provenance", "This build states its corpus is synthetic. A production deployment must record dataset lineage and licensing per feature."],
     ["Fairness", "Valuation inputs exclude borrower demographic attributes; lending policy is applied on collateral and confidence only."],
   ];
   $("controls-body").innerHTML = `<div class="steps" style="grid-template-columns:repeat(2,1fr)">${controls

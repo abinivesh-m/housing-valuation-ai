@@ -1,5 +1,5 @@
 """
-Parametric corpus generator for the HousingValuation AI prototype.
+Parametric corpus generator for the HousingValuation AI engine.
 
 IMPORTANT — DATA PROVENANCE
 ---------------------------
@@ -12,10 +12,10 @@ furnishing uplift, infrastructure distance decay).
 
 Why ship a synthetic corpus?
   Real AVM training requires paid registry/transaction feeds (see
-  docs/DATA_STRATEGY.md for the production data plan). The prototype is
+  docs/DATA_STRATEGY.md for the production data plan). This build is
   therefore honest about its corpus: every accuracy number reported by
   train.py is measured on this synthetic corpus and is NOT evidence of
-  real-world AVM performance. What the prototype does prove is that the
+  real-world AVM performance. What it does prove is that the
   full pipeline — feature contract, model, interval estimation,
   attribution, comparable selection, lending policy, audit trail — works
   end to end and is ready to be pointed at a real feed.

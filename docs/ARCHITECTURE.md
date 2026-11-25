@@ -216,8 +216,14 @@ deploy that boots and then fails on the first request.
   design, not by omission.
 - **Input surface.** Every endpoint validates types and ranges; batch size is capped at 40; audit
   tail is capped at 100 entries.
-- **No authentication.** This is a public demo. A production deployment puts the API behind the
-  lender's gateway with mTLS or OAuth, per-tenant rate limits and request signing.
+- **Authentication on the paid surface.** `/api/v1` requires an `X-API-Key` header. Keys are held in
+  the deployment environment, compared with `secrets.compare_digest`, and counted per key per
+  calendar month. A rejected request does not consume quota; only a completed valuation does.
+- **Quota storage.** Counters live in Upstash Redis when configured, with a per-process fallback for
+  local runs. If the counter backend is unreachable the call is allowed and the failure is logged —
+  taking a paying integration down because Redis hiccuped costs more than the occasional free call.
+- **Public demo.** `/api/*` remains open so the console and model card can be inspected. Put it behind
+  a gateway or WAF if abuse appears; it carries no customer data.
 - **Audit integrity.** The chain detects modification, reordering and payload substitution. It does
   not prevent deletion of the whole file — that requires the durable store described below.
 - **Prompt-injection surface.** None: no LLM in the serving path. The only natural-language component
@@ -258,7 +264,7 @@ The audit tests use a temporary ledger via `HV_AUDIT_PATH`, so the suite never t
 | Synthetic training corpus | Accuracy is within-corpus only | Phase-1 registry feed, `DATA_STRATEGY.md` §3 |
 | No durable ledger | Audit resets on cold start | DynamoDB / S3 Object Lock / append-only Postgres |
 | No satellite features | Declared area taken at face value | Sentinel-2 + Open Buildings footprint check |
-| No authentication | Public demo only | Gateway auth, per-tenant keys |
+| No gateway on the public demo | Demo endpoints are open | Commercial surface is key-authenticated; add a gateway/WAF if the demo is abused |
 | No temporal split | Random holdout flatters the model | Out-of-time holdout on real data |
 | Single-process audit cache | Multi-instance chains diverge | Shared store with conditional writes |
 | Crime index unverified | Feature is an input, not evidence | Citable district-level source or drop the feature |

@@ -135,6 +135,7 @@ body::before {
   cursor: pointer;
   text-align: left;
   width: 100%;
+  text-decoration: none;
   transition: background 0.14s ease, color 0.14s ease;
 }
 .nav-item svg { width: 16px; height: 16px; flex: none; stroke-width: 1.7; }

@@ -24,6 +24,7 @@ Design notes
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -137,7 +138,25 @@ def metrics_block(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
 
 
 def main() -> None:
-    raw = pd.read_csv(DATA)
+    parser = argparse.ArgumentParser(
+        description="Fit, calibrate and export the valuation model."
+    )
+    parser.add_argument("--data", type=Path, default=None,
+                        help="training CSV (default: data/properties.csv)")
+    parser.add_argument("--out", type=Path, default=None,
+                        help="artifact directory (default: artifacts/)")
+    parser.add_argument("--label", type=str, default=None,
+                        help="corpus label written into the artifact's corpus block")
+    args = parser.parse_args()
+
+    data_path = args.data if args.data is not None else ROOT / "data" / "properties.csv"
+    out_dir = args.out if args.out is not None else ROOT / "artifacts"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    global OUT
+    OUT = out_dir
+
+    raw = pd.read_csv(data_path)
     df = add_derived(raw)
 
     vocabs = {c: sorted(df[c].astype(str).unique().tolist()) for c in CATEGORICAL}
@@ -273,13 +292,21 @@ def main() -> None:
         zip(FEATURES, model.feature_importances_.tolist()), key=lambda kv: -kv[1]
     )
 
+    if args.data is not None or args.label is not None:
+        corpus_type = args.label or f"user-supplied transaction corpus ({data_path.name})"
+        corpus_seed = None
+    else:
+        corpus_type = "parametric synthetic corpus (no licensed transaction data)"
+        corpus_seed = SEED
+
     artifact = {
         "schema_version": 2,
         "trained_at": pd.Timestamp.now("UTC").strftime("%Y-%m-%dT%H:%M:%SZ"),
         "corpus": {
             "records": int(len(df)),
-            "type": "parametric synthetic corpus (no licensed transaction data)",
-            "seed": SEED,
+            "type": corpus_type,
+            "seed": corpus_seed,
+            "source_file": str(data_path),
         },
         "target": "log(price_inr)",
         "feature_order": FEATURES,
@@ -355,27 +382,51 @@ def main() -> None:
     )
 
     # ---- coverage map + curated sample properties for the UI ---------------
-    import data_gen
+    if args.data is None and args.label is None:
+        import data_gen
 
-    localities = []
-    for city, entries in data_gen.LOCALITIES.items():
-        for name, coords in entries.items():
-            subset = df[(df["city"] == city) & (df["locality"] == name)]
+        localities = []
+        for city, entries in data_gen.LOCALITIES.items():
+            for name, coords in entries.items():
+                subset = df[(df["city"] == city) & (df["locality"] == name)]
+                localities.append(
+                    {
+                        "city": city,
+                        "locality": name,
+                        "lat": round(coords[0], 5),
+                        "lon": round(coords[1], 5),
+                        "price_index": coords[2],
+                        "median_rate": int(round(float((subset["price_inr"] / subset["area_sqft"]).median())))
+                        if len(subset)
+                        else 0,
+                        "n": int(len(subset)),
+                    }
+                )
+        city_names = sorted(data_gen.CITIES)
+    else:
+        # Derive coverage from the user's own file. No invented geography: a
+        # locality with no coordinates gets the city median, which is honest
+        # about the fact that we do not have parcel-level positions.
+        localities = []
+        for (city, locality), subset in df.groupby(["city", "locality"]):
+            city_subset = df[df["city"] == city]
+            city_median_rate = float((city_subset["price_inr"] / city_subset["area_sqft"]).median())
+            locality_median_rate = float((subset["price_inr"] / subset["area_sqft"]).median())
+            price_index = locality_median_rate / city_median_rate if city_median_rate else 1.0
             localities.append(
                 {
                     "city": city,
-                    "locality": name,
-                    "lat": round(coords[0], 5),
-                    "lon": round(coords[1], 5),
-                    "price_index": coords[2],
-                    "median_rate": int(round(float((subset["price_inr"] / subset["area_sqft"]).median())))
-                    if len(subset)
-                    else 0,
+                    "locality": locality,
+                    "lat": round(float(subset["lat"].median()), 5),
+                    "lon": round(float(subset["lon"].median()), 5),
+                    "price_index": round(price_index, 3),
+                    "median_rate": int(round(locality_median_rate)),
                     "n": int(len(subset)),
                 }
             )
+        city_names = sorted(df["city"].unique().tolist())
 
-    city_names = sorted(data_gen.CITIES)
+    samples = []
     sample_specs = [
         ("Bangalore", "Koramangala", "Apartment"),
         ("Mumbai", "Bandra", "Apartment"),
@@ -386,7 +437,6 @@ def main() -> None:
         ("Bangalore", "Whitefield", "Commercial Office"),
         ("Mumbai", "Thane", "Retail Shop"),
     ]
-    samples = []
     for city, locality, ptype in sample_specs:
         subset = df[(df["city"] == city) & (df["locality"] == locality) & (df["property_type"] == ptype)]
         if subset.empty:
@@ -425,20 +475,45 @@ def main() -> None:
             }
         )
 
+    city_coords = {
+        c: (float(df[df["city"] == c]["lat"].median()),
+            float(df[df["city"] == c]["lon"].median()))
+        for c in city_names
+    }
+    if args.data is None and args.label is None:
+        import data_gen
+        property_types = list(data_gen.PROPERTY_TYPES)
+        furnishing = data_gen.FURNISHING
+        occupancy = data_gen.OCCUPANCY
+        tenure = data_gen.TENURE
+        city_coord_fn = lambda c: (data_gen.CITIES[c]["lat"], data_gen.CITIES[c]["lon"])
+    else:
+        property_types = sorted(df["property_type"].unique().tolist())
+        furnishing = sorted(df["furnishing"].unique().tolist())
+        occupancy = sorted(df["occupancy"].unique().tolist())
+        tenure = sorted(df["tenure"].unique().tolist())
+        city_coord_fn = lambda c: city_coords[c]
+
+    localities_by_city: dict = {}
+    for loc in localities:
+        localities_by_city.setdefault(loc["city"], []).append(loc["locality"])
+    for c in localities_by_city:
+        localities_by_city[c] = sorted(localities_by_city[c])
+
     (OUT / "coverage.json").write_text(
         json.dumps(
             {
                 "cities": [
-                    {"city": c, "lat": data_gen.CITIES[c]["lat"], "lon": data_gen.CITIES[c]["lon"]}
+                    {"city": c, "lat": city_coord_fn(c)[0], "lon": city_coord_fn(c)[1]}
                     for c in city_names
                 ],
                 "city_names": city_names,
                 "localities": localities,
-                "localities_by_city": {c: sorted(data_gen.LOCALITIES[c]) for c in city_names},
-                "property_types": list(data_gen.PROPERTY_TYPES),
-                "furnishing": data_gen.FURNISHING,
-                "occupancy": data_gen.OCCUPANCY,
-                "tenure": data_gen.TENURE,
+                "localities_by_city": localities_by_city,
+                "property_types": property_types,
+                "furnishing": furnishing,
+                "occupancy": occupancy,
+                "tenure": tenure,
                 "samples": samples,
             },
             separators=(",", ":"),

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Terms of use — HousingValuation AI</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/style.css" />
+<style>
+  .page { max-width: 760px; margin: 0 auto; padding: 0 28px 96px; }
+  .page h1 { font-size: 32px; letter-spacing: -0.02em; margin: 40px 0 8px; }
+  .page h2 { font-size: 18px; margin: 28px 0 8px; }
+  .page p, .page li { font-size: 14.5px; line-height: 1.7; color: var(--ink-2); }
+  .page ul { padding-left: 20px; }
+  .page code { font-family: var(--mono); font-size: 13px; background: var(--panel-2); padding: 1px 5px; border-radius: 4px; }
+  .back { display: inline-block; margin-top: 24px; color: var(--accent); text-decoration: none; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="/">← Back to console</a>
+  <h1>Terms of use</h1>
+  <p class="muted" style="color:var(--muted);font-size:13px;">Last updated 2026-11-25</p>
+
+  <h2>1. What this is</h2>
+  <p>The engine is an automated valuation model. It produces a model estimate of property value, a calibrated interval, rupee attribution, comparable sales and a collateral-risk policy position. It is <strong>not</strong> a certified valuation, <strong>not</strong> a registered valuer's report, and <strong>not</strong> a credit decision. It does not see the borrower, the title, the encumbrance or the fraud risk, and it must not be the sole basis for a lending decision.</p>
+
+  <h2>2. Data and accuracy</h2>
+  <p>The shipped model is trained on a documented parametric (synthetic) corpus. Every accuracy figure in the repository and on the site is within-corpus. Production accuracy can only be established against the buyer's own transaction data, which the buyer supplies under their own licence. We make no claim about market accuracy and we will not be held to one.</p>
+
+  <h2>3. No warranty</h2>
+  <p>The software is provided "as is", without warranty of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose and non-infringement.</p>
+
+  <h2>4. Liability</h2>
+  <p>To the maximum extent permitted by law, the maintainer is not liable for any indirect, incidental, special, consequential or punitive damages, or any loss of profits or data, arising from the use of the engine or its outputs. A lender or proptech team that uses the output in a credit decision does so at its own risk and remains responsible for validation, fair-lending review and regulatory compliance in its jurisdiction.</p>
+
+  <h2>5. Fair use of the hosted API</h2>
+  <p>Keys are issued per workspace. Do not share keys, scrape the endpoint, or attempt to reverse-engineer the model beyond what the open repository already permits. We may revoke a key that is used to abuse the service or to circumvent quota.</p>
+
+  <h2>6. Refunds</h2>
+  <p>If the engine returns an error or a malformed response, the call is not billed and the month is credited. We do not refund a month of successful calls because the valuations were inconvenient. One-off skill purchases are refunded within 14 days if the skill does not run on the buyer's machine as documented.</p>
+
+  <h2>7. Changes</h2>
+  <p>These terms may change. Material changes are announced on the repository. The version in force is the one published at the time of use.</p>
+
+  <h2>8. Contact</h2>
+  <p>Open an issue titled <code>terms</code> or <code>commercial enquiry</code> on the repository.</p>
+
+  <p style="margin-top:32px;font-size:12px;color:var(--faint);">Full text: <a href="https://github.com/abinivesh-m/housing-valuation-ai/blob/main/docs/TERMS.md">docs/TERMS.md</a></p>
+</div>
+</body>
+</html>

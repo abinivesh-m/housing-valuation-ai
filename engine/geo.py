@@ -97,7 +97,7 @@ def _query(lat: float, lon: float) -> dict:
         ENDPOINT,
         data=data,
         headers={
-            "User-Agent": "HousingValuationAI/2.0 (hackathon prototype)",
+            "User-Agent": "HousingValuationAI/2.0 (+https://housing-valuation-ai.vercel.app)",
             "Accept": "application/json",
         },
     )

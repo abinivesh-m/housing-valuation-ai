@@ -1,12 +1,20 @@
 # HousingValuation AI
 
-**An explainable automated valuation engine for Indian residential and commercial property, with a risk-based lending layer and a tamper-evident audit trail.**
+**A reference implementation of an explainable, auditable automated valuation model
+(AVM) for Indian residential and commercial property — shipped as a runnable engine,
+a local agent skill, and an MCP server. Bring your own transaction data.**
 
-Built for the **Hero Housing Fintech Challenge — Problem Statement 1: AI-Powered Digital Property Valuation Engine for India**.
+Built for proptech and fintech engineering teams that need a collateral number they
+can defend in a credit file: a calibrated interval, the drivers behind it in rupees,
+an independent comparable cross-check, and a policy position — not a single
+unexplained figure. Also usable as a teaching-grade reference for conformal
+calibration, exact attribution and hash-chained audit.
 
 - **Live engine:** https://housing-valuation-ai.vercel.app
 - **API reference:** https://housing-valuation-ai.vercel.app/docs
-- **License:** MIT
+- **Pricing:** https://housing-valuation-ai.vercel.app/pricing
+- **Commercial API:** metered, key-authenticated, `/api/v1` — see [Commercial access](#commercial-access)
+- **Licence:** MIT (code). A commercial support / validation / indemnity engagement is available separately — see [`docs/COMMERCIAL.md`](docs/COMMERCIAL.md).
 
 ---
 
@@ -68,7 +76,7 @@ These are measured on the holdout split of this project's corpus. **The corpus i
 
 ## Data provenance
 
-**This prototype does not use licensed transaction data.** There is no public Indian property
+**This build does not use licensed transaction data.** There is no public Indian property
 transaction micro-dataset that can be redistributed, and inventing one would be the easiest way to
 fail a diligence review.
 
@@ -92,6 +100,52 @@ market indices — is in [`docs/DATA_STRATEGY.md`](docs/DATA_STRATEGY.md), with 
 whether it is live in this build or planned.
 
 ---
+
+## Bring your own data
+
+The shipped corpus is parametric and synthetic, and the accuracy figures are
+within-corpus. That is honest, but it is not evidence about the Indian market.
+To move from a reference implementation to a number you can quote, point the
+engine at your own transaction file:
+
+```bash
+python ingest.py your_deeds.csv --report reports/ingest.json   # validate + report
+python ingest.py your_deeds.csv --out data/properties.csv      # write training CSV
+python train.py --data data/properties.csv --label "Karnataka registry, 2019-2025"
+```
+
+`ingest.py` accepts CSV, JSON or JSONL, maps 40+ common header names to the
+canonical schema (registrars, portals and spreadsheets all name columns
+differently), parses Indian money formats (`1.85 Cr`, `95 L`, `1,25,00,000`),
+validates ranges, detects duplicates and rate outliers, and writes a JSON report
+you can hand to a reviewer. Hard failures drop the row and are counted; soft
+problems are reported and left for you to decide on. No row is invented and no
+coordinate is fabricated — missing positions are filled from the locality median
+and flagged.
+
+The model, conformal calibration, attribution, comps and policy layer all run
+unchanged on the new data. Only the numbers change, and they are now yours.
+
+## Use it from an agent
+
+The repository ships an MCP server (`mcp_server.py`) with six tools:
+`valuate_property`, `batch_valuate`, `check_loan`, `get_coverage`,
+`get_ready_reckoner_rate`, `get_model_metrics`. It is stdlib-only and runs
+locally. Add it to Claude Desktop, Claude Code, Cursor or Codex:
+
+```json
+{
+  "mcpServers": {
+    "housing-valuation-india": {
+      "command": "python",
+      "args": ["/path/to/housing-valuation-ai/mcp_server.py"]
+    }
+  }
+}
+```
+
+The same engine is also packaged as a local skill zip in `skill/dist/` for
+agent marketplaces. See [`skill/housing-valuation-india/SKILL.md`](skill/housing-valuation-india/SKILL.md).
 
 ## The lending layer
 
@@ -155,7 +209,7 @@ Retrain the model (needs the dev dependencies):
 pip install -r requirements-dev.txt
 python data_gen.py        # regenerate the parametric corpus -> data/properties.csv
 python train.py           # fit, calibrate, export artifacts/*.json, print all metrics
-python -m pytest -q       # 29 tests
+python -m pytest -q       # 46 tests
 ```
 
 `train.py` refuses to write artifacts if the exported trees do not reproduce scikit-learn exactly.
@@ -188,6 +242,42 @@ curl -X POST https://housing-valuation-ai.vercel.app/api/valuate \
 
 ---
 
+## Commercial access
+
+The `/api/*` endpoints are open so anyone can inspect the console and the model card. The
+`/api/v1` surface is the metered one, and it is what a skill, an agent or a lending integration
+should call:
+
+| Route | Purpose |
+|---|---|
+| `POST /api/v1/valuate` | one property, with quota headers and a `metered` block |
+| `POST /api/v1/batch` | up to 40 properties per call |
+| `GET /api/v1/usage` | remaining quota without consuming a call |
+
+Keys are held in the deployment environment as `HVA_API_KEYS=key:plan:quota,...`, compared in
+constant time, and counted per key per calendar month. Counters use Upstash Redis when
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set, and fall back to per-process
+memory otherwise — correct locally, not fit for serverless billing.
+
+```bash
+curl -X POST https://housing-valuation-ai.vercel.app/api/v1/valuate \
+  -H "X-API-Key: $HVA_API_KEY" -H "Content-Type: application/json" \
+  -d '{"city":"Bangalore","locality":"Koramangala","area_sqft":1250}'
+```
+
+The agent skill in [`skill/housing-valuation-india/`](skill/housing-valuation-india/) is a
+**local** package: it ships the model artifacts and a numpy-only runner, so it needs no API key and
+makes no network call. Build the uploadable archive with:
+
+```bash
+python skill/build_zip.py      # -> skill/dist/housing-valuation-india.zip (~0.5 MB)
+```
+
+On the metered API, a rejected request does not consume quota; only a successful valuation is
+counted.
+
+---
+
 ## Coverage
 
 8 cities · 64 micro-markets · 8 property types (5 residential, 3 commercial): Mumbai, Delhi,
@@ -214,7 +304,8 @@ to city-level behaviour for an unseen locality and flags `UNSEEN_MICROMARKET` wh
 ## Repo map
 
 ```
-app.py                     FastAPI routes
+app.py                     FastAPI routes, public demo + metered /api/v1
+metering.py                API keys, monthly quotas, Upstash counters
 engine/
   model.py                 JSON tree loader + pure-numpy inference
   valuation.py             point, conformal band, attribution, comps, confidence
@@ -229,8 +320,9 @@ artifacts/
   locality_stats.json      locality-level medians
   coverage.json            cities, localities, coordinates, sample records
 static/                    console UI (vanilla JS, no build step)
-tests/                     25 API + engine regression tests
-docs/                      model card, data strategy, lending policy, architecture, submission note, screenshots
+skill/                     agent-skill wrapper: SKILL.md + stdlib client
+tests/                     46 tests (API + engine + ingest)
+docs/                      model card, data strategy, lending policy, architecture, product note, pricing, screenshots
 ```
 
 ---

@@ -5,12 +5,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from engine import audit, geo, lending
+import metering
+from engine import audit, geo, lending, ready_reckoner
 from engine.model import ARTIFACT_DIR, load_model
 from engine.valuation import valuate
 
@@ -195,10 +196,11 @@ def valuate_endpoint(req: ValuationRequest) -> JSONResponse:
             "input": payload,
             "coordinates": {"lat": lat, "lon": lon},
             "lending": decision,
+            "ready_reckoner": ready_reckoner.rate(req.city, req.locality, req.property_type),
             "disclaimer": (
-                "Prototype valuation engine. The model was trained on a documented "
-                "parametric corpus, not on licensed transaction data, so the output is "
-                "not a certified valuation and must not be used for an actual credit decision."
+                "Model estimate from an automated valuation engine trained on a documented "
+                "parametric corpus, not on licensed transaction data. The output is not a "
+                "certified valuation and must not be the sole basis for a credit decision."
             ),
         }
     )
@@ -254,6 +256,99 @@ def batch(items: list[BatchItem]) -> JSONResponse:
     )
 
 
+# ---------------------------------------------------------------------------
+# Commercial surface (/api/v1)
+#
+# Everything above is the open product tour, so a visitor can load the console
+# without a key. /api/v1 is the metered surface a paying customer calls: same
+# engine, same payload, plus quota headers and a `metered` block.
+# ---------------------------------------------------------------------------
+
+
+def _principal(api_key: str | None, *, count: bool) -> metering.Principal:
+    try:
+        return metering.authorise(api_key, count=count)
+    except metering.AuthError as exc:
+        raise HTTPException(
+            status_code=401,
+            detail=str(exc),
+            headers={"WWW-Authenticate": "X-API-Key"},
+        ) from exc
+    except metering.QuotaExceeded as exc:
+        raise HTTPException(
+            status_code=429,
+            detail="monthly quota exhausted",
+            headers=exc.principal.headers(),
+        ) from exc
+
+
+def _consume(api_key: str | None) -> metering.Principal:
+    try:
+        return metering.authorise(api_key, count=True)
+    except metering.AuthError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    except metering.QuotaExceeded as exc:
+        # Pre-flight passed and a concurrent call took the last unit. The work
+        # is already done, so return it rather than billing for a 429.
+        return exc.principal
+
+
+def _metered_payload(response: JSONResponse, principal: metering.Principal) -> JSONResponse:
+    payload = json.loads(response.body)
+    payload["metered"] = {
+        "plan": principal.plan,
+        "used": principal.used,
+        "limit": principal.quota,
+        "resets_at": principal.reset_at,
+    }
+    return JSONResponse(payload, headers={**principal.headers(), "Cache-Control": "no-store"})
+
+
+@app.post("/api/v1/valuate")
+def v1_valuate(
+    req: ValuationRequest,
+    x_api_key: str | None = Header(None, alias="X-API-Key"),
+) -> JSONResponse:
+    pre = _principal(x_api_key, count=False)
+    if pre.remaining <= 0:
+        raise HTTPException(
+            status_code=429,
+            detail="monthly quota exhausted",
+            headers={**pre.headers(), "X-Quota-Remaining": "0"},
+        )
+    response = valuate_endpoint(req)
+    return _metered_payload(response, _consume(x_api_key))
+
+
+@app.post("/api/v1/batch")
+def v1_batch(
+    items: list[BatchItem],
+    x_api_key: str | None = Header(None, alias="X-API-Key"),
+) -> JSONResponse:
+    pre = _principal(x_api_key, count=False)
+    if pre.remaining <= 0:
+        raise HTTPException(
+            status_code=429,
+            detail="monthly quota exhausted",
+            headers={**pre.headers(), "X-Quota-Remaining": "0"},
+        )
+    response = batch(items)
+    return _metered_payload(response, _consume(x_api_key))
+
+
+@app.get("/api/v1/usage")
+def v1_usage(x_api_key: str | None = Header(None, alias="X-API-Key")) -> JSONResponse:
+    principal = _principal(x_api_key, count=False)
+    body = {
+        "plan": principal.plan,
+        "used": principal.used,
+        "limit": principal.quota,
+        "remaining": max(principal.remaining, 0),
+        "resets_at": principal.reset_at,
+    }
+    return JSONResponse(body, headers={**principal.headers(), "Cache-Control": "no-store"})
+
+
 @app.get("/api/geo")
 def geo_endpoint(lat: float = Query(..., ge=-90, le=90), lon: float = Query(..., ge=-180, le=180)) -> dict:
     return geo.enrich(lat, lon)
@@ -283,6 +378,13 @@ def index() -> FileResponse:
     return FileResponse(str(STATIC / "index.html"))
 
 
-@app.get("/favicon.svg", include_in_schema=False)
+@app.get("/pricing", include_in_schema=False)
+def pricing() -> FileResponse:
+    return FileResponse(str(STATIC / "pricing.html"))
+
+
+@app.get("/terms", include_in_schema=False)
+def terms() -> FileResponse:
+    return FileResponse(STATIC / "terms.html")
 def favicon() -> FileResponse:
     return FileResponse(str(STATIC / "favicon.svg"))
