@@ -386,5 +386,13 @@ def pricing() -> FileResponse:
 @app.get("/terms", include_in_schema=False)
 def terms() -> FileResponse:
     return FileResponse(STATIC / "terms.html")
+
+@app.get("/api/checkout-url", include_in_schema=False)
+def checkout_url() -> JSONResponse:
+    import os
+    url = os.environ.get("CHECKOUT_URL", "").strip()
+    return JSONResponse({"url": url, "configured": bool(url)})
+
+@app.get("/favicon.svg", include_in_schema=False)
 def favicon() -> FileResponse:
     return FileResponse(str(STATIC / "favicon.svg"))

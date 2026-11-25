@@ -323,16 +323,24 @@
 </div>
 
 <script>
-  // Replace with a Stripe Payment Link or Lemon Squeezy checkout URL when billing
-  // goes live. Until then every CTA opens a pre-filled key request.
-  const CHECKOUT_URL = "";
-  if (CHECKOUT_URL) {
-    document.querySelectorAll('a.btn.primary').forEach(function (a) {
-      a.href = CHECKOUT_URL;
+  // Checkout URL is configured server-side via the CHECKOUT_URL environment
+  // variable (set it on Vercel to your Stripe Payment Link / Lemon Squeezy /
+  // Gumroad URL). Until it is set, every CTA falls back to a pre-filled
+  // GitHub key request so the page never dead-ends.
+  const FALLBACK = "https://github.com/abinivesh-m/housing-valuation-ai/issues/new?title=API%20key%20request&body=Monthly%20volume%3A%0AUse%20case%3A";
+  fetch('/api/checkout-url').then(function (r) { return r.json(); }).then(function (d) {
+    const url = (d && d.url) ? d.url : "";
+    if (!url) return;
+    document.querySelectorAll('a.btn').forEach(function (a) {
+      a.href = url;
       a.target = "_blank";
       a.rel = "noopener";
     });
-  }
+  }).catch(function () { /* keep fallback CTAs */ });
+  // Make sure no CTA is ever empty.
+  document.querySelectorAll('a.btn').forEach(function (a) {
+    if (!a.getAttribute('href')) a.href = FALLBACK;
+  });
 </script>
 
 </body>
