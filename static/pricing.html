@@ -4,85 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Pricing — HousingValuation AI</title>
-<meta name="description" content="Pricing for the HousingValuation AI reference AVM: hosted metered API, data onboarding, shadow-mode validation, and a local agent skill." />
+<meta name="description" content="HousingValuation AI is the automated property valuation engine for Indian real estate. Conformal intervals, rupee attribution, RBI/NHB lending policy. Metered by API key." />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/static/style.css" />
-<style>
-  .page { max-width: 1120px; margin: 0 auto; padding: 0 28px 96px; position: relative; z-index: 1; }
-  .site-head { display: flex; align-items: center; justify-content: space-between; padding: 26px 0 0; }
-  .site-head .brand-mark { width: 34px; height: 34px; border-radius: 9px; }
-  .head-links { display: flex; gap: 22px; align-items: center; font-size: 13px; }
-  .head-links a { color: var(--muted); text-decoration: none; }
-  .head-links a:hover { color: var(--ink); }
-  .hero { padding: 74px 0 44px; max-width: 780px; }
-  .eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
-  .hero h1 { font-size: 44px; line-height: 1.12; letter-spacing: -0.02em; margin: 14px 0 16px; font-weight: 650; }
-  .hero p { font-size: 16.5px; color: var(--muted); line-height: 1.6; max-width: 640px; }
-  .hero .meta { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
-  .pill { font-size: 12px; color: var(--ink-2); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
-  .tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 10px; }
-  .tier { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 22px 22px; display: flex; flex-direction: column; box-shadow: var(--shadow-1); }
-  .tier.featured { border-color: var(--accent); box-shadow: var(--shadow-2); position: relative; }
-  .tier.featured::before { content: "Most teams start here"; position: absolute; top: -11px; left: 20px; background: var(--accent); color: #fff; font-size: 10.5px; font-weight: 600; letter-spacing: .04em; padding: 4px 10px; border-radius: 999px; }
-  .tier h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-  .tier .for { font-size: 12.5px; color: var(--faint); margin-top: 4px; min-height: 34px; }
-  .price { margin: 16px 0 2px; font-size: 34px; font-weight: 650; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  .price span { font-size: 13px; font-weight: 500; color: var(--faint); letter-spacing: 0; }
-  .calls { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .tier ul { list-style: none; margin: 18px 0 22px; padding: 0; font-size: 12.8px; color: var(--ink-2); flex: 1; }
-  .tier li { padding: 5px 0 5px 20px; position: relative; line-height: 1.45; }
-  .tier li::before { content: ""; position: absolute; left: 3px; top: 11px; width: 7px; height: 7px; border-radius: 2px; background: var(--ok); opacity: .85; }
-  .tier li.off { color: var(--faint); }
-  .tier li.off::before { background: var(--line-strong); }
-  .btn { display: block; text-align: center; text-decoration: none; font-size: 13px; font-weight: 600; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--line-strong); color: var(--ink); background: var(--panel-2); transition: background .15s, border-color .15s; }
-  .btn:hover { background: #fff; border-color: var(--muted); }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn.primary:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
-  .skill-strip { margin-top: 18px; background: var(--accent-soft); border: 1px solid #d8e2fb; border-radius: var(--radius); padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-  .skill-strip p { font-size: 13.5px; color: var(--ink-2); }
-  .skill-strip strong { font-weight: 600; }
-  .skill-strip a { white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(29,78,216,.35); padding-bottom: 1px; }
-  section.block { margin-top: 66px; }
-  .block h3 { font-size: 20px; letter-spacing: -0.01em; font-weight: 600; }
-  .block .lede { color: var(--muted); font-size: 14px; margin-top: 6px; max-width: 640px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 20px; }
-  .feature { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px; }
-  .feature h4 { font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
-  .feature p { font-size: 12.8px; color: var(--muted); line-height: 1.55; }
-  table.rates { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; font-size: 13px; }
-  table.rates th, table.rates td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); }
-  table.rates th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); font-weight: 600; background: var(--panel-2); }
-  table.rates td.num { font-variant-numeric: tabular-nums; }
-  table.rates tr:last-child td { border-bottom: 0; }
-  .faq { margin-top: 20px; border-top: 1px solid var(--line); }
-  .faq details { border-bottom: 1px solid var(--line); padding: 16px 0; }
-  .faq summary { cursor: pointer; font-size: 14px; font-weight: 550; list-style: none; display: flex; justify-content: space-between; gap: 20px; }
-  .faq summary::-webkit-details-marker { display: none; }
-  .faq summary::after { content: "+"; color: var(--faint); font-weight: 400; }
-  .faq details[open] summary::after { content: "–"; }
-  .faq p { font-size: 13.2px; color: var(--muted); line-height: 1.6; margin-top: 10px; max-width: 760px; }
-  .note-box { margin-top: 24px; border: 1px solid #f0dcc0; background: var(--warn-soft); border-radius: var(--radius-sm); padding: 16px 18px; font-size: 12.8px; color: #6b3d05; line-height: 1.6; }
-  .note-box strong { font-weight: 600; }
-  .cta { margin-top: 66px; background: var(--ink); color: #fff; border-radius: var(--radius); padding: 38px 36px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
-  .cta h3 { font-size: 24px; letter-spacing: -0.01em; font-weight: 600; }
-  .cta p { color: #b9c3d3; font-size: 13.5px; margin-top: 6px; max-width: 520px; }
-  .cta .btn { background: #fff; border-color: #fff; color: var(--ink); white-space: nowrap; }
-  .site-foot { margin-top: 44px; display: flex; justify-content: space-between; gap: 20px; font-size: 12px; color: var(--faint); flex-wrap: wrap; }
-  .site-foot a { color: var(--muted); text-decoration: none; }
-  @media (max-width: 980px) {
-    .tiers { grid-template-columns: repeat(2, 1fr); }
-    .grid-3 { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 34px; }
-    .cta { flex-direction: column; align-items: flex-start; }
-  }
-  @media (max-width: 620px) {
-    .tiers { grid-template-columns: 1fr; }
-    .skill-strip { flex-direction: column; align-items: flex-start; }
-  }
-</style>
 </head>
 <body>
 
@@ -93,7 +20,7 @@
       <div class="brand-mark">HV</div>
       <div>
         <div class="brand-name">HousingValuation AI</div>
-        <div class="brand-sub">Valuation Engine</div>
+        <div class="brand-sub">Automated Valuation Engine</div>
       </div>
     </a>
     <nav class="head-links">
@@ -105,16 +32,16 @@
   </header>
 
   <section class="hero">
-    <div class="eyebrow">Pricing</div>
-    <h1>Priced per valuation, not per seat.</h1>
+    <div class="eyebrow">Simple, transparent pricing</div>
+    <h1>Property valuation, <b>priced per call — not per seat.</b></h1>
     <p>
-      Every call gives you a complete property valuation: a price estimate, a confidence interval,
-      the reasons behind the number in rupees, comparable sales, and a lending decision.
-      Metered by API key. No setup fee, no minimum commitment.
+      Every call returns a complete valuation: a point estimate, a conformal confidence interval,
+      rupee-level driver attribution, comparable sales, and an RBI/NHB lending position with reason codes.
+      Metered by API key. No setup fee. No minimum term.
     </p>
     <div class="meta">
       <span class="pill">8 cities · 64 micro-markets</span>
-      <span class="pill">55 ms median</span>
+      <span class="pill accent">55 ms median response</span>
       <span class="pill">79.1% interval coverage</span>
       <span class="pill">Batch of 40 per call</span>
     </div>
@@ -134,7 +61,7 @@
         <li>Community support</li>
         <li class="off">Batch endpoint</li>
       </ul>
-      <a class="btn" href="#start">Request a key</a>
+      <a class="btn" href="#start" data-plan="">Request a key</a>
     </div>
 
     <div class="tier featured">
@@ -149,7 +76,7 @@
         <li>Email support, 2 business days</li>
         <li>Overage at $0.05 per valuation</li>
       </ul>
-      <a class="btn primary" href="#start">Start now</a>
+      <a class="btn primary" href="#start" data-plan="developer">Start now</a>
     </div>
 
     <div class="tier">
@@ -164,12 +91,12 @@
         <li>Overage at $0.035 per valuation</li>
         <li>Invoice billing on request</li>
       </ul>
-      <a class="btn" href="#start">Start now</a>
+      <a class="btn" href="#start" data-plan="team">Start now</a>
     </div>
 
     <div class="tier">
       <h2>Validation</h2>
-      <div class="for">An HFC or NBFC running a shadow-mode file review.</div>
+      <div class="for">Shadow-mode file review for HFCs and NBFCs.</div>
       <div class="price">$1,500 <span>/ month</span></div>
       <div class="calls">25,000 valuations · 10 keys</div>
       <ul>
@@ -179,28 +106,33 @@
         <li>Onboarding and calibration review call</li>
         <li>Overage at $0.02 per valuation</li>
       </ul>
-      <a class="btn" href="#start">Talk to us</a>
+      <a class="btn" href="#start" data-plan="validation">Talk to us</a>
     </div>
 
   </section>
 
   <div class="skill-strip">
-    <p>
-      <strong>Buying through an agent marketplace?</strong>
-      The <code>housing-valuation-india</code> skill ships with the model and runs
-      locally — no key, no per-call charge — for a one-off <strong>$29</strong>.
-      It is also an MCP server, so Claude, Cursor and Codex can call it directly.
-    </p>
-    <a href="https://www.agensi.io/sell">See the skill listing</a>
+    <div class="skill-strip-left">
+      <p>
+        Prefer to buy through an agent marketplace? The
+        <code>housing-valuation-india</code> skill ships with the model and runs
+        locally — no key, no per-call charge — for a one-off
+        <strong>$29</strong>. It is also an MCP server, so Claude, Cursor and Codex can call it directly.
+      </p>
+    </div>
+    <div class="skill-strip-right">
+      <div class="skill-price">$29 <span>one-time</span></div>
+      <a href="https://www.agensi.io/skills/housing-valuation-india" target="_blank" rel="noopener">See on Agensi →</a>
+    </div>
   </div>
 
   <section class="block">
-    <h3>Every plan returns the same engine</h3>
+    <h3>Every plan runs the same engine</h3>
     <div class="lede">Plans differ in volume and support, never in model quality. A 50-call trial sees exactly what a lender sees.</div>
     <div class="grid-3">
       <div class="feature">
         <h4>Calibrated, not asserted</h4>
-        <p>Split-conformal intervals measured at 79.1% empirical coverage against a nominal 80%. The band widens for unseen micro-markets instead of hiding the uncertainty.</p>
+        <p>Split-conformal intervals measured at 79.1% empirical coverage against a nominal 80%. The band widens for unseen micro-markets instead of hiding uncertainty.</p>
       </div>
       <div class="feature">
         <h4>Attribution that reconciles</h4>
@@ -208,7 +140,7 @@
       </div>
       <div class="feature">
         <h4>An independent cross-check</h4>
-        <p>Comparable sales with an adjustment grid built separately from the model, so agreement between the two is evidence rather than a tautology.</p>
+        <p>Comparable sales with an adjustment grid built separately from the model — agreement between the two is evidence, not a tautology.</p>
       </div>
       <div class="feature">
         <h4>A policy position</h4>
@@ -220,20 +152,20 @@
       </div>
       <div class="feature">
         <h4>No data account required</h4>
-        <p>The engine carries its own model and artifacts. You do not need a property data subscription, a Zillow key, or a scraping pipeline.</p>
+        <p>The engine carries its own model and artifacts. No property data subscription, Zillow key, or scraping pipeline needed.</p>
       </div>
     </div>
   </section>
 
   <section class="block">
     <h3>Overage, stated plainly</h3>
-    <div class="lede">Calls beyond the plan are billed at the plan rate, never at a penalty rate. You are not cut off mid-month.</div>
+    <div class="lede">Calls beyond the plan are billed at the plan rate, never at a penalty rate. You are never cut off mid-month.</div>
     <table class="rates">
       <thead>
         <tr><th>Plan</th><th>Included</th><th>Overage per valuation</th><th>Effective rate at cap</th></tr>
       </thead>
       <tbody>
-        <tr><td>Explore</td><td class="num">50</td><td class="num">not billed — calls stop</td><td class="num">—</td></tr>
+        <tr><td>Explore</td><td class="num">50</td><td class="num">calls stop</td><td class="num">—</td></tr>
         <tr><td>Developer</td><td class="num">1,000</td><td class="num">$0.050</td><td class="num">$0.049</td></tr>
         <tr><td>Team</td><td class="num">5,000</td><td class="num">$0.035</td><td class="num">$0.040</td></tr>
         <tr><td>Validation</td><td class="num">25,000</td><td class="num">$0.020</td><td class="num">$0.060</td></tr>
@@ -247,11 +179,9 @@
       <details>
         <summary>What is the training data?</summary>
         <p>
-          A documented parametric corpus, not licensed transaction data — no redistributable national
-          transaction dataset exists in India. Within-corpus MAPE is 11.16% against 12.86% for a
-          locality rate card, and the repository says so in the first screen. The engine is a working
-          system ready for a registry feed, not a claim about market accuracy. If you need production
-          accuracy today, this is not the product for you, and we would rather say that before you pay.
+          A documented parametric corpus — no redistributable national transaction dataset exists in India.
+          Within-corpus MAPE is 11.16% against 12.86% for a locality rate card. The engine is a working
+          valuation system ready for your own registry feed, not a claim about market accuracy.
         </p>
       </details>
       <details>
@@ -285,14 +215,6 @@
           inconvenient.
         </p>
       </details>
-      <details>
-        <summary>Is there an SLA?</summary>
-        <p>
-          Team and Lender plans carry a 99.5% monthly availability target on the valuation endpoint,
-          excluding scheduled maintenance announced 48 hours ahead. Explore and Developer are
-          best-effort.
-        </p>
-      </details>
     </div>
     <div class="note-box">
       <strong>Read this before buying.</strong> The model is trained on a synthetic corpus and every
@@ -307,15 +229,18 @@
       <h3>Start with a key, not a sales call.</h3>
       <p>Tell us the monthly volume you expect and we will issue a key the same day. Lender pilots include a validation report on your own files.</p>
     </div>
-    <a class="btn" id="cta-mail" href="https://github.com/abinivesh-m/housing-valuation-ai/issues/new?title=API%20key%20request&amp;body=Monthly%20volume%3A%0AUse%20case%3A">Request a key</a>
+    <a class="btn primary" href="https://github.com/abinivesh-m/housing-valuation-ai/issues/new?title=API%20key%20request&amp;body=Monthly%20volume%3A%0AUse%20case%3A" target="_blank" rel="noopener">Request a key</a>
   </section>
 
   <footer class="site-foot">
-    <div>HousingValuation AI · model v2.0 · MIT-licensed engine</div>
+    <div class="foot-brand">HousingValuation AI · model v2.0 · MIT-licensed engine</div>
     <div>
-      <a href="/docs">API reference</a> ·
-      <a href="/api/meta">Model card</a> ·
-      <a href="/terms">Terms</a> ·
+      <a href="/docs">API reference</a>
+      <span class="sep">·</span>
+      <a href="/api/meta">Model card</a>
+      <span class="sep">·</span>
+      <a href="/terms">Terms</a>
+      <span class="sep">·</span>
       <a href="https://github.com/abinivesh-m/housing-valuation-ai">Source</a>
     </div>
   </footer>
@@ -323,19 +248,27 @@
 </div>
 
 <script>
-  // Checkout URL is configured server-side via CHECKOUT_URL env var.
-  // Default fallback is set here so CTAs work even before env var is configured.
-  const FALLBACK_CHECKOUT = "https://checkout.dodopayments.com/buy/pdt_0NshJlAWP8vyOSqMV1UGl?quantity=1";
-  const FALLBACK = "https://github.com/abinivesh-m/housing-valuation-ai/issues/new?title=API%20key%20request&body=Monthly%20volume%3A%0AUse%20case%3A";
-  fetch('/api/checkout-url').then(function (r) { return r.json(); }).then(function (d) {
-    const url = (d && d.url) ? d.url : FALLBACK_CHECKOUT;
-    document.querySelectorAll('a.btn').forEach(function (a) {
-      a.href = url;
-      a.target = "_blank";
-      a.rel = "noopener";
+  // Per-plan checkout URLs. Fetched from the backend, which reads CHECKOUT_URL_<PLAN> env vars
+  // (falling back to CHECKOUT_URL, then to the skill product link so the page never dead-ends).
+  const FALLBACK = "https://checkout.dodopayments.com/buy/pdt_0NshJlAWP8vyOSqMV1UGl?quantity=1";
+  const plans = ["skill", "developer", "team", "validation"];
+  const urlCache = {};
+  Promise.all(plans.map(function (plan) {
+    return fetch('/api/checkout-url?plan=' + plan)
+      .then(function (r) { return r.json(); })
+      .then(function (d) { urlCache[plan] = (d && d.url) ? d.url : FALLBACK; })
+      .catch(function () { urlCache[plan] = FALLBACK; });
+  })).then(function () {
+    document.querySelectorAll('a.btn, a[data-plan]').forEach(function (a) {
+      const plan = a.getAttribute('data-plan');
+      if (plan && urlCache[plan]) {
+        a.href = urlCache[plan];
+        a.target = "_blank";
+        a.rel = "noopener";
+      } else if (!plan && !a.href.startsWith('http')) {
+        a.href = FALLBACK;
+      }
     });
-  }).catch(function () {
-    document.querySelectorAll('a.btn').forEach(function (a) { a.href = FALLBACK_CHECKOUT; });
   });
 </script>
 

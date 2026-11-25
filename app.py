@@ -388,10 +388,25 @@ def terms() -> FileResponse:
     return FileResponse(STATIC / "terms.html")
 
 @app.get("/api/checkout-url", include_in_schema=False)
-def checkout_url() -> JSONResponse:
+def checkout_url(plan: str = "") -> JSONResponse:
     import os
-    url = os.environ.get("CHECKOUT_URL", "https://checkout.dodopayments.com/buy/pdt_0NshJlAWP8vyOSqMV1UGl?quantity=1").strip()
-    return JSONResponse({"url": url, "configured": bool(url)})
+    # Map plan names to environment variables. Falls back to the skill checkout
+    # link so the page never dead-ends.
+    plan = (plan or "").strip().lower()
+    env_map = {
+        "skill": "CHECKOUT_URL_SKILL",
+        "developer": "CHECKOUT_URL_DEVELOPER",
+        "team": "CHECKOUT_URL_TEAM",
+        "validation": "CHECKOUT_URL_VALIDATION",
+    }
+    env_key = env_map.get(plan, "CHECKOUT_URL")
+    url = os.environ.get(env_key, "").strip()
+    if not url:
+        # Fallback to the generic CHECKOUT_URL, then to the skill product link
+        url = os.environ.get("CHECKOUT_URL", "").strip()
+    if not url:
+        url = "https://checkout.dodopayments.com/buy/pdt_0NshJlAWP8vyOSqMV1UGl?quantity=1"
+    return JSONResponse({"url": url, "configured": bool(os.environ.get(env_key, "").strip() or os.environ.get("CHECKOUT_URL", "").strip()), "plan": plan or "default"})
 
 @app.get("/favicon.svg", include_in_schema=False)
 def favicon() -> FileResponse:
