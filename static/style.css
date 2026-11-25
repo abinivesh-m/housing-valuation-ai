@@ -82,18 +82,18 @@ body::before {
 .head-links a { color: var(--muted); text-decoration: none; font-weight: 500; }
 .head-links a:hover { color: var(--accent); }
 
-/* ---------- hero ---------- */
-.hero { padding: 96px 0 60px; max-width: 860px; }
+/* ---------- pricing hero ---------- */
+.pricing-hero { padding: 96px 0 60px; max-width: 860px; }
 
-.eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 18px; display: inline-block; }
+.pricing-hero .eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 18px; display: inline-block; }
 
-.hero h1 { font-size: 56px; line-height: 1.08; letter-spacing: -0.03em; margin: 0 0 24px; font-weight: 800; color: var(--ink); }
+.pricing-hero h1 { font-size: 56px; line-height: 1.08; letter-spacing: -0.03em; margin: 0 0 24px; font-weight: 800; color: var(--ink); }
 
-.hero h1 b { color: var(--accent-dark); }
+.pricing-hero h1 b { color: var(--accent-dark); }
 
-.hero p { font-size: 20px; color: var(--ink-2); line-height: 1.7; max-width: 700px; margin-bottom: 32px; font-weight: 450; }
+.pricing-hero p { font-size: 20px; color: var(--ink-2); line-height: 1.7; max-width: 700px; margin-bottom: 32px; font-weight: 450; }
 
-.hero .meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+.pricing-hero .meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
 
 .pill {
   font-size: 12px; font-weight: 600; color: var(--ink-2);
